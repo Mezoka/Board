@@ -27,13 +27,13 @@ board -black "C:\Fuego 1.1.4\fuego.exe" "--config fuegoconf.cfg" -white "C:\Pach
 
 Key Controls
 
-Next Move - Right or Down or Wheel Down
+Next - Right or Down or Wheel Down
 
-Back Move - Left or Up or Wheel Up
+Back - Left or Up or Wheel Up
 
-Next 10 Moves - Page Down
+Next 10 - Page Down
 
-Back 10 Moves - Page Up
+Back 10 - Page Up
 
 Start - Home
 
