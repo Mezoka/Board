@@ -1,1 +1,0 @@
-board -black "Beta.exe" -white "Beta.exe"
