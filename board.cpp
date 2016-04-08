@@ -7,7 +7,7 @@
 
 void Board::Clear()
 {
-	std::vector<Node>().swap(Tree);
+    std::vector<Node>().swap(Tree);
     std::vector<Node>().swap(Tree2);
 
     Node node;
@@ -17,25 +17,25 @@ void Board::Clear()
 
     Turn = BLACK;
     Mode = 3; // play black and white
-	Index = 0;
+    Index = 0;
     Index2 = -1;
     Path = 0;
     Pass = 0;
 
-	memset(Point, 0, sizeof(Point));
-	memset(Mark, 0, sizeof(Point));
+    memset(Point, 0, sizeof(Point));
+    memset(Mark, 0, sizeof(Point));
     memset(Area, 0, sizeof(Point));
 }
 
 void Board::Reset(int x, int y)
 {
-	if (x > MAX_BOARD) x = MAX_BOARD;
-	else if (x < MIN_BOARD) x = MIN_BOARD;
-	if (y > MAX_BOARD) y = MAX_BOARD;
-	else if (y < MIN_BOARD) y = MIN_BOARD;
+    if (x > MAX_BOARD) x = MAX_BOARD;
+    else if (x < MIN_BOARD) x = MIN_BOARD;
+    if (y > MAX_BOARD) y = MAX_BOARD;
+    else if (y < MIN_BOARD) y = MIN_BOARD;
 
-	Size = Width = x;
-	Height = y;
+    Size = Width = x;
+    Height = y;
 
     int a = 3;
     int b = Size - 4;
@@ -51,12 +51,12 @@ void Board::Reset(int x, int y)
     Star[14] = b; Star[15] = c;
     Star[16] = c; Star[17] = b;
 
-	Clear();
+    Clear();
 }
 
 int Board::CheckBound(int x, int y)
 {
-	return (x >= 0 && y >= 0 && x < Width && y < Height);
+    return (x >= 0 && y >= 0 && x < Width && y < Height);
 }
 
 int Board::GetColor(int x, int y)
@@ -66,76 +66,76 @@ int Board::GetColor(int x, int y)
 
 void Board::Print()
 {
-	char Color[3] = {'.', 'X', 'O'};
+    char Color[3] = {'.', 'X', 'O'};
 
-	for (int y = 0; y < Height; y++) {
-		for (int x = 0; x < Width; x++) {
-			printf("%c ", Color[GetColor(x, y)]);
-		}
-		printf("\n");
-	}
-	printf("\n");
+    for (int y = 0; y < Height; y++) {
+        for (int x = 0; x < Width; x++) {
+            printf("%c ", Color[GetColor(x, y)]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }
 
 int Board::OtherColor(int color)
 {
-	return (color ^ 3);
+    return (color ^ 3);
 }
 
 Board::Property Board::MakeProperty(int label, int value, int x, int y)
 {
-	Property Prop;
+    Property Prop;
 
     Prop.Label = label;
     Prop.Value = value;
     Prop.Row = x;
     Prop.Col = y;
 
-	return Prop;
+    return Prop;
 }
 
 void Board::Capture(int x, int y, int color, Node *n)
 {
-	if (CheckBound(x, y) && GetColor(x, y) == color) {
-		Point[y][x] = 0;
+    if (CheckBound(x, y) && GetColor(x, y) == color) {
+        Point[y][x] = 0;
         n->Prop.push_back(MakeProperty(TOKEN_TAKE, color, x, y));
 
-		Capture(x - 1, y, color, n);
-		Capture(x + 1, y, color, n);
-		Capture(x, y - 1, color, n);
-		Capture(x, y + 1, color, n);
-	}
+        Capture(x - 1, y, color, n);
+        Capture(x + 1, y, color, n);
+        Capture(x, y - 1, color, n);
+        Capture(x, y + 1, color, n);
+    }
 }
 
 int Board::CheckLiberty(int x, int y, int color)
 {
-	if (CheckBound(x, y))
-	{
-		int k = GetColor(x, y);
-		if (k == EMPTY) return 1;
-		if (k != color || Mark[y][x] == Path) return 0;
+    if (CheckBound(x, y))
+    {
+        int k = GetColor(x, y);
+        if (k == EMPTY) return 1;
+        if (k != color || Mark[y][x] == Path) return 0;
 
-		// visit //
-		Mark[y][x] = Path;
+        // visit //
+        Mark[y][x] = Path;
 
-		// found liberty //
-		if (CheckLiberty(x - 1, y, color)) return 1;
-		if (CheckLiberty(x + 1, y, color)) return 1;
-		if (CheckLiberty(x, y - 1, color)) return 1;
-		if (CheckLiberty(x, y + 1, color)) return 1;
-	}
+        // found liberty //
+        if (CheckLiberty(x - 1, y, color)) return 1;
+        if (CheckLiberty(x + 1, y, color)) return 1;
+        if (CheckLiberty(x, y - 1, color)) return 1;
+        if (CheckLiberty(x, y + 1, color)) return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
 // check for capture //
 void Board::Check(int x, int y, int color, Node *node)
 {
-	if (CheckBound(x, y) && GetColor(x, y) == color) {
-		Path = Path + 1;
-		if (CheckLiberty(x, y, color) == 0)
+    if (CheckBound(x, y) && GetColor(x, y) == color) {
+        Path = Path + 1;
+        if (CheckLiberty(x, y, color) == 0)
             Capture(x, y, color, node);
-	}
+    }
 }
 
 void Board::CheckAll(int x, int y, int color, Node *node)
@@ -215,7 +215,7 @@ int Board::Play(int x, int y, int color)
             Tree.push_back(node);
             return 1;
         }
-	}
+    }
     else {
         TreeCut();
         Index++;
@@ -228,7 +228,7 @@ int Board::Play(int x, int y, int color)
         return 1;
     }
 
-	return 0;
+    return 0;
 }
 
 int Board::Append(int x, int y, int color)
@@ -330,24 +330,24 @@ int Board::GetProperty(QString &buf, int i, int j)
     QString str = buf.mid(i, j - i);
     str = str.toUpper();
 
-	if (str == "B")
-		return TOKEN_BLACK;
-	if (str == "W")
-		return TOKEN_WHITE;
+    if (str == "B")
+        return TOKEN_BLACK;
+    if (str == "W")
+        return TOKEN_WHITE;
     if (str == "C")
         return TOKEN_COMMENT;
     if (str == "SZ")
-		return TOKEN_SIZE;
-	if (str == "PB")
-		return TOKEN_PLAY_BLACK;
-	if (str == "PW")
-		return TOKEN_PLAY_WHITE;
+        return TOKEN_SIZE;
+    if (str == "PB")
+        return TOKEN_PLAY_BLACK;
+    if (str == "PW")
+        return TOKEN_PLAY_WHITE;
     if (str == "AB")
         return TOKEN_ADD_BLACK;
     if (str == "AW")
         return TOKEN_ADD_WHITE;
     if (str == "EV" || str == "TE")
-		return TOKEN_EVENT;
+        return TOKEN_EVENT;
     if (str == "LB")
         return TOKEN_LABEL;
     if (str == "MA")
@@ -359,13 +359,13 @@ int Board::GetProperty(QString &buf, int i, int j)
     if (str == "SQ")
         return TOKEN_SQUARE;
     if (str == "DT" || str == "RD")
-		return TOKEN_DATE;
+        return TOKEN_DATE;
     if (str == "KM" || str == "KO")
-		return TOKEN_KOMI;
-	if (str == "RE")
-		return TOKEN_RESULT;
+        return TOKEN_KOMI;
+    if (str == "RE")
+        return TOKEN_RESULT;
 
-	return TOKEN_NONE;
+    return TOKEN_NONE;
 }
 
 int Board::GetNumber(QString &buf, int i, int j)
@@ -405,7 +405,7 @@ int Board::Read(QString Path, int k)
     QString buf = Stream.readAll();
     file.close();
 
-	int fsize = buf.size();
+    int fsize = buf.size();
     if (fsize <= 0) return 0;
 
     int token = TOKEN_NONE;
