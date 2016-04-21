@@ -505,43 +505,44 @@ void Window::CreateDock()
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    QStringList args = QCoreApplication::arguments();
     Window Win;
 
     if (argc == 2) {
-        Win.Widget->Read(argv[1]);
+        Win.Widget->Read(args[1]);
     }
     else if (argc > 2) {
         QString str[2], arg[2];
         int color = EMPTY;
 
         for (int i = 1; i < argc; i++) {
-            if (strcmp("-black", argv[i]) == 0) {
+            if (args[i] == "-black") {
                 color = BLACK;
             }
-            else if (strcmp("-white", argv[i]) == 0) {
+            else if (args[i] == "-white") {
                 color = WHITE;
             }
-            else if (strcmp("-size", argv[i]) == 0) {
+            else if (args[i] == "-size") {
                 if (i + 1 < argc) {
-                    int size = atoi(argv[i + 1]);
+                    int size = args[i + 1].toInt();
                     Win.Widget->board.Reset(size, size);
                     i++;
                 }
             }
-            else if (strcmp("-komi", argv[i]) == 0) {
+            else if (args[i] == "-komi") {
                 if (i + 1 < argc) {
-                    Win.Widget->board.BOARD_KOMI = argv[i + 1];
+                    Win.Widget->board.BOARD_KOMI = args[i + 1];
                     i++;
                 }
             }
             else {
                 if (color == BLACK) {
-                    if (str[0].isEmpty()) str[0] = argv[i];
-                    else arg[0] = argv[i];
+                    if (str[0].isEmpty()) str[0] = args[i];
+                    else arg[0] = args[i];
                 }
                 else if (color == WHITE) {
-                    if (str[1].isEmpty()) str[1] = argv[i];
-                    else arg[1] = argv[i];
+                    if (str[1].isEmpty()) str[1] = args[i];
+                    else arg[1] = args[i];
                 }
             }
         }
