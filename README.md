@@ -55,7 +55,9 @@ Score - A
 
 Save - S (001.SGF)
 
+![Alt text](A02.png?raw=true)
 
+![Alt text](A03.png?raw=true)
 
 ![Alt text](A04.png?raw=true)
 
