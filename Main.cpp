@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
             else if (args[i] == "-komi") {
                 if (i + 1 < argc) {
                     Main.Child->Child.BOARD_KOMI = args[i + 1];
+                    Main.Child->Child.Komi = Main.Child->Child.BOARD_KOMI.toDouble();
                     i++;
                 }
             }
