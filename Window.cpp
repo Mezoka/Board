@@ -195,6 +195,8 @@ Board::Board(QWidget *parent) : QWidget(parent)
     View = 0;
     Side = 3; // play black & white
 
+    Cursor[0] = QPoint(-1, -1);
+    Cursor[1] = QPoint(-1, -1);
 }
 
 int Board::Read(const QString &file, int k)
@@ -289,16 +291,16 @@ void Board::wheelEvent(QWheelEvent *event)
 void Board::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() == Qt::NoButton) {
-        Cursor2 = QPoint(-1, -1);
+        Cursor[1] = QPoint(-1, -1);
 
         int Half = GridSize / 2;
-        int i2, i = x1 - Half;
-        int j2, j = y1 - Half;
+        int i2, i = BOARD_LEFT - Half;
+        int j2, j = BOARD_TOP - Half;
 
         for (int x = 0; x < Child.Size; x++) {
             i2 = i + GridSize;
             if (event->x() > i && event->x() <= i2) {
-                Cursor2.setX(x);
+                Cursor[1].setX(x);
                 break;
             }
             i = i2;
@@ -307,17 +309,17 @@ void Board::mouseMoveEvent(QMouseEvent *event)
         for (int y = 0; y < Child.Size; y++) {
             j2 = j + GridSize;
             if (event->y() > j && event->y() <= j2) {
-                Cursor2.setY(y);
+                Cursor[1].setY(y);
                 break;
             }
             j = j2;
         }
 
-        if ((Cursor.x() < 0 || Cursor.y() < 0) &&
-            (Cursor2.x() < 0 || Cursor2.y() < 0)) return;
+        if ((Cursor[0].x() < 0 || Cursor[0].y() < 0) &&
+            (Cursor[1].x() < 0 || Cursor[1].y() < 0)) return;
 
-        if (Cursor != Cursor2) {
-            Cursor = Cursor2;
+        if (Cursor[0] != Cursor[1]) {
+            Cursor[0] = Cursor[1];
             repaint();
         }
     }
@@ -327,16 +329,16 @@ void Board::mousePressEvent(QMouseEvent *event)
 {
     setFocus();
 
-    if (Cursor.x() >= 0 && Cursor.y() >= 0 && GridSize > 6) {
+    if (Cursor[0].x() >= 0 && Cursor[0].y() >= 0 && GridSize > 6) {
         if (Mode == MODE_PLAY) {
             if ((Side & Child.Stat.Turn) && (Side & Child.Tree.back().Turn)) {
                 if (event->buttons() == Qt::LeftButton) {
                     int n = Child.Tree.size() - Child.Index - 1;
-                    if (Child.Play(Cursor.x(), Cursor.y(), Child.Stat.Turn)) {
+                    if (Child.Play(Cursor[0].x(), Cursor[0].y(), Child.Stat.Turn)) {
                         repaint();
                         if (Side != 3) {
                             while (n--) Other->Task.append("undo\r\n");
-                            Other->Play(Cursor.x(), Cursor.y(), Child.Size);
+                            Other->Play(Cursor[0].x(), Cursor[0].y(), Child.Size);
                         }
                     }
                 }
@@ -347,7 +349,7 @@ void Board::mousePressEvent(QMouseEvent *event)
         }
         else {
             if (event->buttons() == Qt::LeftButton) {
-                if (Child.Play(Cursor.x(), Cursor.y(), Child.Stat.Turn, Mode == MODE_FILE)) {
+                if (Child.Play(Cursor[0].x(), Cursor[0].y(), Child.Stat.Turn, Mode == MODE_FILE)) {
                     repaint();
                 }
             }
@@ -469,10 +471,7 @@ void Board::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     GridSize = std::min(size().width(), size().height()) / (Child.Size + 2.5);
 
-    int d = (600 - 24 * GridSize) / 14 + 24;
-    QColor ColorBorder(d, d, d);
     QColor ColorBack(216, 172, 76);
-
     painter.setBackground(QBrush(ColorBack));
     painter.fillRect(0, 0, size().width(), size().height(), ColorBack);
 
@@ -481,17 +480,19 @@ void Board::paintEvent(QPaintEvent *event)
     double Font = GridSize / 2.8;
     double Radius = GridSize * 0.4823 - 0.5869;
 
-    x1 = (size().width() - Width) / 2;
-    y1 = (size().height() - Width) / 2;
-    x2 = x1 + Width;
-    y2 = y1 + Width;
+    BOARD_LEFT = (size().width() - Width) / 2;
+    BOARD_TOP = (size().height() - Width) / 2;
+    BOARD_RIGHT = BOARD_LEFT + Width;
+    BOARD_LOWER = BOARD_TOP + Width;
+
+    qDebug() << GridSize;
 
     if (GridSize > 6) {
         painter.setPen(QPen(QColor(48, 48, 48), 0, Qt::SolidLine, Qt::FlatCap));
 
         for (int i = 0, d = 0; i < Child.Size; i++, d += GridSize) {
-            painter.drawLine(x1 + d, y1, x1 + d, y2);
-            painter.drawLine(x1, y1 + d, x2 + 1, y1 + d);
+            painter.drawLine(BOARD_LEFT + d, BOARD_TOP, BOARD_LEFT + d, BOARD_LOWER);
+            painter.drawLine(BOARD_LEFT, BOARD_TOP + d, BOARD_RIGHT + 1, BOARD_TOP + d);
         }
 
         painter.setRenderHint(QPainter::Antialiasing);
@@ -504,26 +505,26 @@ void Board::paintEvent(QPaintEvent *event)
             painter.setFont(QFont("Arial", Font));
 
             if ((View & SHOW_GRID_LABEL) && (View & SHOW_SCORE) == 0) {
-                int k1 = y1 - GridSize * 1.05;
-                int k2 = y2 + GridSize * 1.05;
+                int k1 = BOARD_TOP - GridSize * 1.05;
+                int k2 = BOARD_LOWER + GridSize * 1.05;
 
-                for (int i = 0, x = x1; i < Child.Size; i++, x += GridSize) {
+                for (int i = 0, x = BOARD_LEFT; i < Child.Size; i++, x += GridSize) {
                     QChar Value = QChar('A' + i + (i < 8 ? 0 : 1));
                     painter.drawText(x - GridSize + 1, k1 - GridSize + 1, Grid, Grid, Qt::AlignCenter, Value);
                     painter.drawText(x - GridSize + 1, k2 - GridSize + 1, Grid, Grid, Qt::AlignCenter, Value);
                 }
 
-                k1 = x1 - GridSize * 1.18;
-                k2 = x2 + GridSize * 1.17;
+                k1 = BOARD_LEFT - GridSize * 1.18;
+                k2 = BOARD_RIGHT + GridSize * 1.17;
 
-                for (int i = 0, y = y1; i < Child.Size; i++, y += GridSize) {
+                for (int i = 0, y = BOARD_TOP; i < Child.Size; i++, y += GridSize) {
                     QString Value = QString::number(Child.Size - i);
                     painter.drawText(k1 - GridSize - 0, y - GridSize + 1, Grid, Grid, Qt::AlignCenter, Value);
                     painter.drawText(k2 - GridSize - 0, y - GridSize + 1, Grid, Grid, Qt::AlignCenter, Value);
                 }
             }
             if (View & SHOW_SCORE) {
-                painter.drawText(0, y1 - GridSize * 1.05 - GridSize + 1, size().width(), Grid, Qt::AlignCenter, Child.BOARD_SCORE);
+                painter.drawText(0, BOARD_TOP - GridSize * 1.05 - GridSize + 1, size().width(), Grid, Qt::AlignCenter, Child.BOARD_SCORE);
             }
         }
 
@@ -534,7 +535,7 @@ void Board::paintEvent(QPaintEvent *event)
 
             for (int i = 0, k = 0; i < 9; i++, k += 2) {
                 if (Child.Size & 1 == 0 && i >= 4) break;
-                painter.drawEllipse(x1 + Child.Star[k] * GridSize - 2, y1 + Child.Star[k + 1] * GridSize - 2, 5, 5);
+                painter.drawEllipse(BOARD_LEFT + Child.Star[k] * GridSize - 2, BOARD_TOP + Child.Star[k + 1] * GridSize - 2, 5, 5);
             }
         }
 
@@ -545,8 +546,8 @@ void Board::paintEvent(QPaintEvent *event)
             double dsize = GridSize / 4.2;
             TriPoly << QPoint(0, -1 * dsize) << QPoint(0.866 * dsize, 0.5 * dsize) << QPoint(-0.866 * dsize, 0.5 * dsize);
 
-            for (int j = 0, y = y1; j < Child.Size; j++, y += GridSize) {
-                for (int i = 0, x = x1; i < Child.Size; i++, x += GridSize) {
+            for (int j = 0, y = BOARD_TOP; j < Child.Size; j++, y += GridSize) {
+                for (int i = 0, x = BOARD_LEFT; i < Child.Size; i++, x += GridSize) {
                     int k = Child.GetPoint(i, j);
                     int color = Child.Stat.Point[k];
                     int color2 = Child.Area[k];
@@ -562,12 +563,12 @@ void Board::paintEvent(QPaintEvent *event)
                     }
 
                     if (color == BLACK) {
-                        painter.setPen(QPen(QColor(24, 24, 24), 1, Qt::SolidLine));
+                        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
                         painter.setBrush(QColor(0, 0, 0));
                         painter.drawEllipse(QPointF(x + 0.5, y + 0.5), Radius, Radius);
                     }
                     else if (color == WHITE) {
-                        painter.setPen(QPen(ColorBorder, 1, Qt::SolidLine));
+                        painter.setPen(QPen(QColor(24, 24, 24), 1.01, Qt::SolidLine));
                         painter.setBrush(QColor(240, 240, 240));
                         painter.drawEllipse(QPointF(x + 0.5, y + 0.5), Radius, Radius);
                     }
@@ -589,8 +590,8 @@ void Board::paintEvent(QPaintEvent *event)
             for (int i = 0; i < total; i++) {
                 Go::GoProp Prop = Child.Tree[Child.Index].Prop[i];
                 int color = Child.GetColor(Prop.Col, Prop.Row);
-                int x = x1 + Prop.Col * GridSize;
-                int y = y1 + Prop.Row * GridSize;
+                int x = BOARD_LEFT + Prop.Col * GridSize;
+                int y = BOARD_TOP + Prop.Row * GridSize;
 
                 if (Prop.Label == Go::TOKEN_PLAY || Prop.Label == Go::TOKEN_CIRCLE) {
                     QColor color2 = (color == BLACK ? QColor(240, 240, 240) : Qt::black);
@@ -632,11 +633,11 @@ void Board::paintEvent(QPaintEvent *event)
             }
 
             // Cursor //
-            if (Cursor.x() >=0 && Cursor.y() >= 0) {
+            if (Cursor[0].x() >=0 && Cursor[0].y() >= 0) {
                 QColor color = Child.Index2 < 0 ? QColor(0, 224, 0) : Qt::red;
                 painter.setPen(QPen(color, 2, Qt::SolidLine));
                 painter.setBrush(color);
-                painter.drawEllipse(x1 + Cursor.x() * GridSize - 2, y1 + Cursor.y() * GridSize - 2, 5, 5);
+                painter.drawEllipse(BOARD_LEFT + Cursor[0].x() * GridSize - 2, BOARD_TOP + Cursor[0].y() * GridSize - 2, 5, 5);
             }
         }
     }
@@ -646,7 +647,7 @@ void Board::paintEvent(QPaintEvent *event)
 Window::Window()
 {
     Child = new Board(this);
-    SetTitle(Child->Child.BOARD_DATE);
+    SetTitle("Window");
     setCentralWidget(Child);
     resize(800, 700);
 }

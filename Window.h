@@ -82,12 +82,14 @@ protected:
     void dropEvent(QDropEvent *event);
     void wheelEvent(QWheelEvent *event);
 
-    QPoint Cursor = QPoint(-1, -1);
-    QPoint Cursor2 = QPoint(-1, -1);
+    QPoint Cursor[2];
 
     int GridSize;
-    int x1, y1;
-    int x2, y2;
+
+    int BOARD_TOP, BOARD_LEFT;
+    int BOARD_LOWER, BOARD_RIGHT;
+    int TABLE_TOP, TABLE_LEFT;
+    int TABLE_WIDTH;
 
 };
 
