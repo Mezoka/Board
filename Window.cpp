@@ -485,8 +485,6 @@ void Board::paintEvent(QPaintEvent *event)
     BOARD_RIGHT = BOARD_LEFT + Width;
     BOARD_LOWER = BOARD_TOP + Width;
 
-    qDebug() << GridSize;
-
     if (GridSize > 6) {
         painter.setPen(QPen(QColor(48, 48, 48), 0, Qt::SolidLine, Qt::FlatCap));
 
