@@ -303,7 +303,7 @@ int Go::CheckRemove(int z, int color)
     return Block[0];
 }
 
-// Play Board at z and returns 1 if no ko, or fill eye
+// Play Board at z and returns 1 if ko or fill eye
 int Go::CheckPlay(int z, int color, int color2)
 {
     if (z == Stat.Ko) return 1;
