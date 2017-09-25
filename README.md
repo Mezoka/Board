@@ -33,6 +33,7 @@ Navigation : Left, Right, Up, Down, Page Up, Page Down, Home, End, Esc, Wheel Up
 
 Other : F1 Coord, F2 Score, S Save 001.SGF, P Pass, T Pause
 
+
 ![Alt text](A02.png?raw=true)
 
 ![Alt text](A03.png?raw=true)
