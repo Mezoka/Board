@@ -1,13 +1,13 @@
-#ifndef __WINDOW_H_
-#define __WINDOW_H_
+#ifndef _WINDOW_H_
+#define _WINDOW_H_
 
 #include <QtWidgets>
-#include "Go.h"
+#include "Board.h"
 
 enum
 {
-    MODE_FILE = 1,
-    MODE_PLAY
+    BOARD_FILE = 1,
+    BOARD_PLAY
 };
 
 class Player : public QObject
@@ -16,12 +16,14 @@ class Player : public QObject
 
 public:
 
-    Player(QWidget *parent, int color);
+    Player(QWidget *parent, int color, int size = 0, double komi = 0);
     ~Player();
 
-    void Setup(QString str, QString arg);
-    void Play(QString str);
-    void Play(int x, int y, int size);
+    void Setup(const QString &str, const QString &arg);
+    int CheckTask(const QString &str);
+    void Append(const QString &str);
+    void Play(QString str, int color = 0);
+    void Play(int x, int y, int size, int color = 0);
     void Send();
     void Remove();
 
@@ -31,37 +33,35 @@ public:
     QProcess *Process;
     QTextEdit *TextEdit;
     QStringList Task;
-
-    Player *Other;
+    QString Respond;
 
 public slots:
 
     void readStandardOutput();
     void readStandardError();
 
-protected:
-
-    QString GetRespond(QString str);
 };
 
-class Board : public QWidget
+class Widget : public QWidget
 {
 public:
 
-    Board(QWidget *parent = NULL);
-    int Read(const QString &file, int k = 0);
-    void ShowTable(int init = 0);
+    Widget(QWidget *parent = NULL);
 
-    Go Child;
-    Player *Other;
+    void ShowTable(int init = 0);
+    void SetTitle(const QString &str);
+    void GetRespond(const QString &str, int color);
+
+    int Read(const QString &file, int k = 0);
+
+    Board Child;
+    Player *Play[3];
 
     enum
     {
-        SHOW_TEXT = 1,
-        SHOW_LABEL = 2,
-        SHOW_GRID_LABEL = 4,
-        SHOW_GRID_SCORE = 8,
-        SHOW_SCORE = 16,
+        VIEW_LABEL = 1,
+        VIEW_SCORE = 2,
+        VIEW_MARK = 4,
         PLAY_PAUSE = 32
     };
 
@@ -87,8 +87,9 @@ protected:
     int GridSize;
 
     int BOARD_TOP, BOARD_LEFT;
-    int BOARD_LOWER, BOARD_RIGHT;
+    int BOARD_DOWN, BOARD_RIGHT;
     int TABLE_TOP, TABLE_LEFT;
+    int TABLE_DOWN, TABLE_RIGHT;
     int TABLE_WIDTH;
 
 };
@@ -98,17 +99,13 @@ class Window : public QMainWindow
 public:
 
     Window();
+
     void CreateDock();
+    void CreateMenu();
     void SetTitle(QString str = "");
 
-    Board *Child;
-
-    QTextEdit *TextEdit;
-    QTextEdit *TextEdit2;
+    Widget *Child;
     QString Title;
-
-    Player *Player1;
-    Player *Player2;
 
 protected:
 

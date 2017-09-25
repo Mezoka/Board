@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 
     if (argc == 2 || argc == 3) {
         if (!args[1].startsWith("-")) {
-            Main.Child->Mode = MODE_FILE;
+            Main.Child->Mode = BOARD_FILE;
             Main.CreateDock();
             Main.Child->Read(args[1], (argc == 2 ? 0 : args[2].toInt()));
         }
@@ -39,6 +39,12 @@ int main(int argc, char *argv[])
                     i++;
                 }
             }
+            else if (args[i] == "-handicap") {
+                if (i + 1 < argc) {
+                    Main.Child->Child.BOARD_HANDICAP = args[i + 1];
+                    i++;
+                }
+            }
             else {
                 if (color == BLACK) {
                     if (str[0].isEmpty()) str[0] = args[i];
@@ -53,23 +59,42 @@ int main(int argc, char *argv[])
 
         // Start //
         if (color != EMPTY) {
-            Main.Child->Mode = MODE_PLAY;
-            Main.CreateDock();
-
             if (!str[0].isEmpty()) {
-                Main.Child->Side &= 2; // human not black
-                Main.Child->Other = Main.Player1;
-                Main.Player1->Setup(str[0], arg[0]);
+                Main.Child->Side |= BLACK; // computer black
+                Main.Child->Play[BLACK] = new Player(Main.Child, BLACK, Main.Child->Child.Size, Main.Child->Child.Komi);
+                Main.Child->Play[BLACK]->Setup(str[0], arg[0]);
             }
             if (!str[1].isEmpty()) {
-                Main.Child->Side &= 1; // human not white
-                Main.Child->Other = Main.Player2;
-                Main.Player2->Setup(str[1], arg[1]);
+                Main.Child->Side |= WHITE; // computer white
+                Main.Child->Play[WHITE] = new Player(Main.Child, WHITE, Main.Child->Child.Size, Main.Child->Child.Komi);
+                Main.Child->Play[WHITE]->Setup(str[1], arg[1]);
             }
 
-            Main.Player1->Task.append("genmove black\r\n");
-            Main.Player1->Send();
-            Main.Player2->Send();
+            Main.Child->Mode = BOARD_PLAY;
+            Main.CreateDock();
+
+            if (!Main.Child->Child.BOARD_HANDICAP.isEmpty()) {
+                if (Main.Child->Child.SetHandicap(Main.Child->Child.BOARD_HANDICAP.toInt())) {
+                    for (int i = 1; i <= Main.Child->Child.Handicap[0]; i += 2) {
+                        if (Main.Child->Play[BLACK])
+                            Main.Child->Play[BLACK]->Play(Main.Child->Child.Handicap[i], Main.Child->Child.Handicap[i + 1], Main.Child->Child.Size, BLACK);
+                        if (Main.Child->Play[WHITE])
+                            Main.Child->Play[WHITE]->Play(Main.Child->Child.Handicap[i], Main.Child->Child.Handicap[i + 1], Main.Child->Child.Size, BLACK);
+                    }
+                }
+                else Main.Child->Child.BOARD_HANDICAP.clear();
+            }
+
+            if (Main.Child->Play[BLACK]) {
+                if (Main.Child->Child.BOARD_HANDICAP.isEmpty())
+                    Main.Child->Play[BLACK]->Append("genmove b");
+                Main.Child->Play[BLACK]->Send();
+            }
+            if (Main.Child->Play[WHITE]) {
+                if (!Main.Child->Child.BOARD_HANDICAP.isEmpty())
+                    Main.Child->Play[WHITE]->Append("genmove w");
+                Main.Child->Play[WHITE]->Send();
+            }
         }
     }
 
