@@ -2,11 +2,11 @@ TARGET = Board
 
 QT += widgets
 
-HEADERS += Go.h \
+HEADERS += Board.h \
     Window.h
 
 SOURCES += Main.cpp \
-    Go.cpp \
+    Board.cpp \
     Window.cpp
 
 RC_FILE = Board.rc
