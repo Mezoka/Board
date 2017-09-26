@@ -3,7 +3,7 @@ Graphical Go Board in Qt and C++ with GTP support
 
 ![Alt text](A01.png?raw=true)
 
-Usage Examples
+### Usage Examples
 
 Board file.sgf (or drag file to the program)
 
@@ -27,11 +27,11 @@ Board -black "C:\Fuego 1.1.4\fuego.exe" -white "C:\Pachi 11\pachi.exe" "-f book.
 
 Board -black "C:\Fuego 1.1.4\fuego.exe" "--config fuegoconf.cfg" -white "C:\Pachi 11\pachi.exe" "-f book.dat -t =100000 threads=1,pondering=0" -size 13 -komi 7.5
 
-Key Controls
+### Key Controls
 
-Navigation : Left, Right, Up, Down, Page Up, Page Down, Home, End, Esc, Wheel Up, Wheel Down
+    Navigation : Left, Right, Up, Down, Page Up, Page Down, Home, End, Esc, Wheel Up, Wheel Down
 
-Other : F1 Coord, F2 Score, S Save 001.SGF, P Pass, T Pause
+    Other : F1 Coord, F2 Score, S Save 001.SGF, P Pass, T Pause
 
 ![Alt text](A02.png?raw=true)
 
