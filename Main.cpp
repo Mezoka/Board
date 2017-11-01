@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 
             if (!Main.Child->Child.BOARD_HANDICAP.isEmpty()) {
                 if (Main.Child->Child.SetHandicap(Main.Child->Child.BOARD_HANDICAP.toInt())) {
+                    Main.Child->Child.State.Turn = WHITE;
                     for (int i = 1; i <= Main.Child->Child.Handicap[0]; i += 2) {
                         if (Main.Child->Play[BLACK])
                             Main.Child->Play[BLACK]->Play(Main.Child->Child.Handicap[i], Main.Child->Child.Handicap[i + 1], Main.Child->Child.Size, BLACK);
