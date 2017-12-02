@@ -723,9 +723,10 @@ int Board::Write(const QString &str)
         PLAYER_WHITE.left(64) + (WHITE_LEVEL.isEmpty() ? "" : " ") + WHITE_LEVEL.left(32), BOARD_DATE, BOARD_RESULT);
 
     for (int i = 0; i < Record.Node.size(); i++) {
+        int token = TOKEN_NONE;
+
         for (int k = 0; k < Record.Node[i].Prop.size(); k++) {
             GoProp Prop = Record.Node[i].Prop[k];
-            int token = TOKEN_NONE;
 
             if (Prop.Label == TOKEN_ADD) {
                 if (Prop.Value == BLACK) {
