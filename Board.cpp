@@ -739,7 +739,6 @@ int Board::Write(const QString &str)
                 }
 
                 Stream << QString("[%1%2]").arg(QChar('a' + Prop.Col), QChar('a' + Prop.Row));
-                token = (Prop.Value == BLACK ? TOKEN_ADD_BLACK : TOKEN_ADD_WHITE);
             }
             else if (Prop.Label == TOKEN_PLAY) {
                 Stream << ";" << (Prop.Value == BLACK ? "B" : "W") <<
