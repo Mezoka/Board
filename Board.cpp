@@ -470,9 +470,7 @@ int Board::Undo(int k)
     if (Record.Index <= 0 || k <= 0) return 0;
 
     while (Record.Index && k) {
-        int total = Record.Node[Record.Index].Prop.size();
-
-        for (int i = 0; i < total; i++) {
+        for (int i = Record.Node[Record.Index].Prop.size() - 1; i >= 0; i--) {
             GoProp Prop = Record.Node[Record.Index].Prop[i];
             if (Prop.Label == TOKEN_PLAY || Prop.Label == TOKEN_ADD)
                 State.Table[GetPoint(Prop.Col, Prop.Row)] = 0;
